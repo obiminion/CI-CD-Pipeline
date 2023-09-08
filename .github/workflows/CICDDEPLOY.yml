@@ -1,4 +1,4 @@
-name: CICDDEPLOY
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,39 +6,59 @@ on:
       - main
 
 jobs:
-  build_and_scan:
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    # SonarQube Analysis
     - name: SonarQube Analysis
       uses: sonarsource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.MY_GH_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - name: OWASP Dependency Check
-      uses: OSSF/ossf-dependency-check-action@v1
+    # Set up Java for OWASP Dependency-Check
+    - name: Set up Java
+      uses: actions/setup-java@v2
       with:
-        token: ${{ secrets.MY_GH_TOKEN }}
+        distribution: 'adopt'
+        java-version: '11'
 
+    # Download and Unzip Dependency-Check for OWASP
+    - name: Download and Unzip Dependency-Check
+      run: |
+        wget -O dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v6.0.2/dependency-check-6.0.2-release.zip
+        unzip dependency-check.zip
+
+    # Run OWASP Dependency-Check
+    - name: Run OWASP Dependency-Check
+      run: |
+        ./dependency-check/bin/dependency-check.sh --project "My Project" --scan ./path-to-your-project
+
+    # Build Docker Image
     - name: Build Docker Image
-      run: docker build -t my-web-app .
+      run: |
+        docker build -t my-web-app .
 
+    # Trivy Scan
     - name: Trivy Scan
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: 'my-web-app'
         token: ${{ secrets.MY_GH_TOKEN }}
 
+    # Setup Terraform
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
+    # Terraform Init
     - name: Terraform Init
       run: terraform init
 
+    # Terraform Apply
     - name: Terraform Apply
       run: terraform apply -auto-approve
       env:
