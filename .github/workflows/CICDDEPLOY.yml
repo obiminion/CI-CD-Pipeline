@@ -19,6 +19,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.MY_GH_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_PROJECT_KEY: sonar_project_key
+        SONAR_ORGANIZATION: sonar_organization
 
     # Set up Java for OWASP Dependency-Check
     - name: Set up Java
