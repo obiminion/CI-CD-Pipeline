@@ -10,38 +10,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-name: Checkout code
+    - name: Checkout code
       uses: actions/checkout@v2
 
-name: SonarQube Analysis
+    - name: SonarQube Analysis
       uses: sonarsource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-name: OWASP Dependency Check
+    - name: OWASP Dependency Check
       uses: OSSF/ossf-dependency-check-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
-name: Build Docker Image
-run: docker build -t my-web-app
+    - name: Build Docker Image
+      run: docker build -t my-web-app .
 
-name: Trivy Scan
+    - name: Trivy Scan
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: 'my-web-app'
         token: ${{ secrets.GITHUB_TOKEN }}
 
-name: Setup Terraform
+    - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
-name: Terraform Init
+    - name: Terraform Init
       run: terraform init
 
-name: Terraform Apply
+    - name: Terraform Apply
       run: terraform apply -auto-approve
       env:
         DO_TOKEN: ${{ secrets.DO_TOKEN }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
-
