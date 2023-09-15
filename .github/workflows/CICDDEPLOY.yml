@@ -13,16 +13,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    # Debug current dir (Optional - only for debugging purposes)
+    - name: Debug current dir
+      run: |
+        pwd
+        ls -al
+
     # SonarQube Analysis
     - name: SonarQube Analysis
       uses: sonarsource/sonarcloud-github-action@master
       with:
-          args: >
-            -Dsonar.projectKey=obiminion_CI-CD-Pipeline
-            -Dsonar.organization=obiminion
+        args: >
+          -Dsonar.projectKey=obiminion_CI-CD-Pipeline
+          -Dsonar.organization=obiminion
       env:
-          GITHUB_TOKEN: ${{ secrets.MY_GH_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.MY_GH_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     # Set up Java for OWASP Dependency-Check
     - name: Set up Java
@@ -39,13 +45,11 @@ jobs:
 
     # Run OWASP Dependency-Check
     - name: Run OWASP Dependency-Check
-      run: |
-        ./dependency-check/bin/dependency-check.sh --project "My Project" --scan ./path-to-your-project
+      run: ./dependency-check/bin/dependency-check.sh --project "My Project" --scan .
 
     # Build Docker Image
     - name: Build Docker Image
-      run: |
-        docker build -t my-web-app .
+      run: docker build -t my-web-app .
 
     # Trivy Scan
     - name: Trivy Scan
