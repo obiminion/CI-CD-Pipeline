@@ -58,7 +58,7 @@ jobs:
         image-ref: 'my-web-app'
         token: ${{ secrets.MY_GH_TOKEN }}
 
-    # Setup Terraform
+     # Setup Terraform
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
@@ -66,9 +66,23 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-    # Terraform Apply
+    # Terraform Apply to provision droplet
     - name: Terraform Apply
       run: terraform apply -auto-approve
       env:
         DO_TOKEN: ${{ secrets.DO_TOKEN }}
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+
+    # SSH into DigitalOcean droplet and Deploy
+    - name: Deploy to DigitalOcean
+      run: |
+        # SSH into the DO droplet and deploy Docker container
+        ssh -o "StrictHostKeyChecking=no" ${{ secrets.SSH_USER }}@${{ steps.set-ip.outputs.droplet_ip }} "
+          docker pull my-web-app:latest
+          docker stop web-container || true
+          docker rm web-container || true
+          docker run --name web-container -d -p 80:80 my-web-app:latest
+        "
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
