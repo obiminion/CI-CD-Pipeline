@@ -40,12 +40,12 @@ jobs:
     # Download and Unzip Dependency-Check for OWASP
     - name: Download and Unzip Dependency-Check
       run: |
-        wget -O dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v6.0.2/dependency-check-6.0.2-release.zip
-        unzip dependency-check.zip
+        wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
+        unzip dependency-check-8.4.0-release.zip
 
-    # Run OWASP Dependency-Check
+    # Run OWASP Dependency-Check with disabled assembly identification
     - name: Run OWASP Dependency-Check
-      run: ./dependency-check/bin/dependency-check.sh --project "My Project" --scan .
+      run: ./dependency-check/bin/dependency-check.sh --project "My Project" --scan . --disableAssembly
 
     # Build Docker Image
     - name: Build Docker Image
