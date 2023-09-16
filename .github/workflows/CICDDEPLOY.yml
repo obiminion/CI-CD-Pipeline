@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 6
 
     steps:
     - name: Checkout code
@@ -68,7 +69,7 @@ jobs:
 
     # Terraform Apply to provision droplet
     - name: Terraform Apply
-      run: terraform apply -auto-approve
+      run: terraform apply -auto-approve -input=false
       env:
         DO_TOKEN: ${{ secrets.DO_TOKEN }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
