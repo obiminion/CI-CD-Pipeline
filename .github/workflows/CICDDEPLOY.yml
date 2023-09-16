@@ -58,7 +58,7 @@ jobs:
         image-ref: 'my-web-app'
         token: ${{ secrets.MY_GH_TOKEN }}
 
-    # Setup Terraform
+       # Setup Terraform
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
@@ -74,13 +74,21 @@ jobs:
     - name: Terraform Validate
       run: terraform validate
 
+    # Debug before Terraform Apply (New)
+    - name: Debug before Terraform Apply
+      run: echo "About to run Terraform Apply."
+
     # Terraform Apply to provision droplet
     - name: Terraform Apply
       run: terraform apply -auto-approve -var "do_token=${{ env.DO_TOKEN }}" -var "SSH_KEY=${{ env.SSH_KEY }}"
       env:
         DO_TOKEN: ${{ secrets.DO_TOKEN }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
+        TF_LOG: DEBUG  # Enable Terraform debug logs
 
+    # Debug after Terraform Apply (New)
+    - name: Debug after Terraform Apply
+      run: echo "Terraform Apply should have run."
     # SSH into DigitalOcean droplet and Deploy
     - name: Deploy to DigitalOcean
       run: |
