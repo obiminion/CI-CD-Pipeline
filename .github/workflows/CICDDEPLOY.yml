@@ -58,17 +58,25 @@ jobs:
         image-ref: 'my-web-app'
         token: ${{ secrets.MY_GH_TOKEN }}
 
-     # Setup Terraform
+    # Setup Terraform
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
+
+    # Print Terraform Version (for debugging)
+    - name: Terraform Version
+      run: terraform --version
 
     # Terraform Init
     - name: Terraform Init
       run: terraform init
 
+    # Terraform Validate
+    - name: Terraform Validate
+      run: terraform validate
+
     # Terraform Apply to provision droplet
     - name: Terraform Apply
-      run: terraform apply -auto-approve -input=false
+      run: terraform apply -auto-approve -var "do_token=${{ env.DO_TOKEN }}" -var "SSH_KEY=${{ env.SSH_KEY }}"
       env:
         DO_TOKEN: ${{ secrets.DO_TOKEN }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
