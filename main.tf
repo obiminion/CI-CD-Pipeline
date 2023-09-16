@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "digitalocean" {
-  token = var.do_token
+  token = var.DO_TOKEN
 }
 
 resource "digitalocean_droplet" "web" {
