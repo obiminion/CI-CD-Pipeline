@@ -1,5 +1,5 @@
 variable "DO_TOKEN" {
-  description = "dop_v1_f7d4324ef70e7cb3d6cae15bb50fa04248d0ff9235097bd59960827f48bc3763"
+  description = "dop_v1_0b29118a7f9cf849993a67429c863331b8b75818ce157971901177812636031f"
   type        = string
 }
 
