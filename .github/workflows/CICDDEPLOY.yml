@@ -73,11 +73,9 @@ jobs:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         TF_LOG: DEBUG
 
-    - name: Get and Set Droplet IP
-      run: |
-        RAW_OUTPUT=$(terraform output -raw droplet_ip_address)
-        CLEAN_OUTPUT=$(echo "$RAW_OUTPUT" | awk -F '::debug::' '{print $1}')
-        echo "DROPLET_IP=${CLEAN_OUTPUT}" >> $GITHUB_ENV
+    - name: Get Droplet IP
+      id: droplet-ip
+      run: echo "::set-output name=DROPLET_IP::$(terraform output -raw droplet_ip_address)"
 
     - name: Initialize and Setup SSH
       run: |
@@ -88,7 +86,7 @@ jobs:
     
     - name: Deploy to DigitalOcean
       run: |
-        ssh -o "StrictHostKeyChecking=no" ${{ secrets.SSH_USER }}@$DROPLET_IP "
+        ssh -o "StrictHostKeyChecking=no" ${{ secrets.SSH_USER }}@${{ steps.droplet-ip.outputs.DROPLET_IP }} "
           docker pull my-web-app:latest
           docker stop web-container || true
           docker rm web-container || true
