@@ -79,8 +79,8 @@ jobs:
     - name: Display Droplet IP from File
       run: cat droplet_ip.txt
     
-    - name: Load Droplet IP into Environment Variable
-      run: echo "DROPLET_IP=$(cat droplet_ip.txt)" >> $GITHUB_ENV
+    - name: Load Droplet IP into Environment Variable for Subsequent Steps
+      run: echo "export DROPLET_IP=$(cat droplet_ip.txt)" >> $GITHUB_ENV
     
     - name: Initialize and Setup SSH
       run: |
