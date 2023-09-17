@@ -77,9 +77,13 @@ jobs:
       id: set-ip
       run: echo "::set-output name=droplet_ip::$(terraform output -raw droplet_ip_address)"
 
+    - name: Setup SSH Agent
+      run: |
+        eval $(ssh-agent -s)
+
     - name: Setup SSH Key
       run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa  # Use SSH_PRIVATE_KEY here as well
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
         chmod 600 id_rsa
         ssh-add id_rsa
       env:
