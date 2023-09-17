@@ -73,6 +73,7 @@ jobs:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         TF_LOG: DEBUG
 
+        # Debugging and Setting IP Address
     - name: Get Droplet IP and Store in File
       run: terraform output -raw droplet_ip_address > droplet_ip.txt
 
@@ -82,10 +83,16 @@ jobs:
     - name: Set and Clean Droplet IP
       run: |
         RAW_IP=$(cat droplet_ip.txt)
+        echo "Raw IP is $RAW_IP"
         CLEANED_IP=$(echo $RAW_IP | awk -F "::" '{print $1}')
         echo "Cleaned IP is $CLEANED_IP"
         echo "DROPLET_IP=$CLEANED_IP" >> $GITHUB_ENV
 
+    # Debugging Environment Variables
+    - name: Debug Environment Variables
+      run: echo "Debug DROPLET_IP: $DROPLET_IP"
+
+    # SSH and Deployment Steps
     - name: Initialize and Setup SSH
       run: |
         eval $(ssh-agent -s)
