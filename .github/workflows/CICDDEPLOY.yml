@@ -75,12 +75,15 @@ jobs:
 
     - name: Get Droplet IP and Store in File
       run: terraform output -raw droplet_ip_address > droplet_ip.txt
-    
+
     - name: Display Droplet IP from File
       run: cat droplet_ip.txt
-    
+
     - name: Load Droplet IP into Environment Variable for Subsequent Steps
-      run: echo "export DROPLET_IP=$(cat droplet_ip.txt)" >> $GITHUB_ENV
+      run: |
+        DROPLET_IP=$(cat droplet_ip.txt)
+        echo "Cleaned IP is $DROPLET_IP"
+        echo "export DROPLET_IP=$DROPLET_IP" >> $GITHUB_ENV
     
     - name: Initialize and Setup SSH
       run: |
