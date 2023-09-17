@@ -80,7 +80,7 @@ jobs:
 
     # Terraform Apply to provision droplet
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var "do_token=${{ env.DO_TOKEN }}" -var "SSH_KEY=${{ env.SSH_KEY }}"
+      run: terraform apply -auto-approve -var "DO_TOKEN=${{ env.DO_TOKEN }}" -var "SSH_KEY=${{ env.SSH_KEY }}"
       env:
         DO_TOKEN: ${{ secrets.DO_TOKEN }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
