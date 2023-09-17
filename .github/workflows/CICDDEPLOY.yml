@@ -78,21 +78,31 @@ jobs:
     - name: Debug before Terraform Apply
       run: echo "About to run Terraform Apply."
 
-    # Terraform Apply to provision droplet
+   # Terraform Apply to provision droplet
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var "DO_TOKEN=${{ env.DO_TOKEN }}" -var "SSH_KEY=${{ env.SSH_KEY }}"
+      run: terraform apply -auto-approve -var "DO_TOKEN=${{ secrets.DO_TOKEN }}" -var "SSH_KEY=${{ secrets.SSH_KEY }}"
       env:
         DO_TOKEN: ${{ secrets.DO_TOKEN }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
         TF_LOG: DEBUG  # Enable Terraform debug logs
 
-    # Debug after Terraform Apply (New)
-    - name: Debug after Terraform Apply
-      run: echo "Terraform Apply should have run."
+    # Assume the output is named `droplet_ip_address`
+    - name: Set Droplet IP
+      id: set-ip
+      run: echo "::set-output name=droplet_ip::$(terraform output -raw droplet_ip_address)"
+
+    # Load the SSH key for GitHub Action runner
+    - name: Setup SSH Key
+      run: |
+        echo "${{ secrets.SSH_KEY }}" > id_rsa
+        chmod 600 id_rsa
+        ssh-add id_rsa
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
     # SSH into DigitalOcean droplet and Deploy
     - name: Deploy to DigitalOcean
       run: |
-        # SSH into the DO droplet and deploy Docker container
         ssh -o "StrictHostKeyChecking=no" ${{ secrets.SSH_USER }}@${{ steps.set-ip.outputs.droplet_ip }} "
           docker pull my-web-app:latest
           docker stop web-container || true
