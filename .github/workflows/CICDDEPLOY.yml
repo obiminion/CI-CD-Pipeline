@@ -67,10 +67,10 @@ jobs:
       run: echo "About to run Terraform Apply."
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var "DO_TOKEN=${{ secrets.DO_TOKEN }}" -var "SSH_KEY=${{ secrets.SSH_PRIVATE_KEY }}"
+      run: terraform apply -auto-approve -var "DO_TOKEN=${{ secrets.DO_TOKEN }}" -var "SSH_KEY=${{ secrets.SSH_KEY }}"
       env:
         DO_TOKEN: ${{ secrets.DO_TOKEN }}
-        SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # Changed from SSH_KEY to SSH_PRIVATE_KEY
+        SSH_KEY: ${{ secrets.SSH_KEY }}
         TF_LOG: DEBUG
 
     - name: Set Droplet IP
