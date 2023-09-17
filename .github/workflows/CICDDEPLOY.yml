@@ -76,7 +76,10 @@ jobs:
     - name: Get Droplet IP
       id: droplet-ip
       run: echo "::set-output name=DROPLET_IP::$(terraform output -raw droplet_ip_address)"
-
+      
+    - name: Debug IP
+      run: echo "The Droplet IP is ${{ steps.droplet-ip.outputs.DROPLET_IP }}"
+    
     - name: Initialize and Setup SSH
       run: |
         eval $(ssh-agent -s)
@@ -86,6 +89,7 @@ jobs:
     
     - name: Deploy to DigitalOcean
       run: |
+        echo "Deploying to IP ${{ steps.droplet-ip.outputs.DROPLET_IP }}"
         ssh -o "StrictHostKeyChecking=no" ${{ secrets.SSH_USER }}@${{ steps.droplet-ip.outputs.DROPLET_IP }} "
           docker pull my-web-app:latest
           docker stop web-container || true
