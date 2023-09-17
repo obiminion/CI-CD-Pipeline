@@ -81,9 +81,10 @@ jobs:
 
     - name: Load Droplet IP into Environment Variable for Subsequent Steps
       run: |
-        DROPLET_IP=$(cat droplet_ip.txt)
-        echo "Cleaned IP is $DROPLET_IP"
-        echo "export DROPLET_IP=$DROPLET_IP" >> $GITHUB_ENV
+        RAW_IP=$(cat droplet_ip.txt)
+        CLEANED_IP=$(echo $RAW_IP | awk -F "::" '{print $1}')
+        echo "Cleaned IP is $CLEANED_IP"
+        echo "DROPLET_IP=$CLEANED_IP" >> $GITHUB_ENV
     
     - name: Initialize and Setup SSH
       run: |
