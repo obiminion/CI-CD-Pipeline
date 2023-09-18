@@ -51,9 +51,12 @@ jobs:
         image-ref: 'my-web-app'
         token: ${{ secrets.MY_GH_TOKEN }}
 
-     # SSH and Deployment Steps
     - name: Initialize and Setup SSH
       run: |
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        touch ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
         eval $(ssh-agent -s)
         ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
