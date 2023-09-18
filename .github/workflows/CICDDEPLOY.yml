@@ -18,39 +18,6 @@ jobs:
         pwd
         ls -al
 
-    - name: SonarQube Analysis
-      uses: sonarsource/sonarcloud-github-action@master
-      with:
-        args: >
-          -Dsonar.projectKey=obiminion_CI-CD-Pipeline
-          -Dsonar.organization=obiminion
-      env:
-        GITHUB_TOKEN: ${{ secrets.MY_GH_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-    - name: Set up Java
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: '11'
-
-    - name: Download and Unzip Dependency-Check
-      run: |
-        wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
-        unzip dependency-check-8.4.0-release.zip
-
-    - name: Run OWASP Dependency-Check
-      run: ./dependency-check/bin/dependency-check.sh --project "My Project" --scan . --disableAssembly
-
-    - name: Build Docker Image
-      run: docker build -t my-web-app .
-
-    - name: Trivy Scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'my-web-app'
-        token: ${{ secrets.MY_GH_TOKEN }}
-
    # SSH and Deployment Steps
     - name: Initialize and Setup SSH
       run: |
@@ -63,6 +30,12 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
         chmod 600 id_rsa
         ssh-add id_rsa
+        
+    - name: Debug SSH Connection
+      run: |
+        ssh -v ${{ secrets.SSH_USER }}@${{ secrets.DROPLET_IP }} "ls /var/www"
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
 
     - name: Deploy to Existing DigitalOcean Droplet
       run: |
