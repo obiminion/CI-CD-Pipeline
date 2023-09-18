@@ -78,17 +78,11 @@ jobs:
 
     - name: Display Droplet IP from File
       run: cat droplet_ip.txt
-
+      
     - name: Set and Clean Droplet IP
-      run: |
-        RAW_IP=$(cat droplet_ip.txt)
-        echo "Raw IP is $RAW_IP"
-        CLEANED_IP=$(echo $RAW_IP | awk -F "::" '{print $1}')
-        echo "Cleaned IP is $CLEANED_IP"
-        echo "DROPLET_IP=$CLEANED_IP" >> $GITHUB_ENV
-        
-    - name: Debug Environment Variables
-      run: echo "Debug DROPLET_IP:$DROPLET_IP"
+      run: echo "DROPLET_IP=$(cat droplet_ip.txt)" >> $GITHUB_ENV
+      env:
+        DROPLET_IP: ""
 
     # SSH and Deployment Steps
     - name: Initialize and Setup SSH
