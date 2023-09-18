@@ -18,9 +18,11 @@ jobs:
         pwd
         ls -al
 
-    - name: Install SSH key
+    - name: Setup SSH agent
       run: |
         mkdir -p ~/.ssh
+        ssh-agent -s > ssh-agent.out
+        source ssh-agent.out
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
@@ -28,10 +30,9 @@ jobs:
         ssh-add -p passphrase.txt ~/.ssh/id_rsa < /dev/null
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-            
 
     - name: Deploy to Existing DigitalOcean Droplet
       run: |
-        scp -r ./* ${{ secrets.SSH_USER }}@${{ secrets.DROPLET_IP }}:/var/www/obinnaCICD/
+        scp -r ./* ${{ secrets.SSH_USER }}@${{ secrets.REMOTE_HOST }}:/var/www/obinnaCICD/
       env:
         SSH_USER: ${{ secrets.SSH_USER }}
