@@ -51,52 +51,17 @@ jobs:
         image-ref: 'my-web-app'
         token: ${{ secrets.MY_GH_TOKEN }}
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-
-    - name: Terraform Version
-      run: terraform --version
-
-    - name: Terraform Init
-      run: terraform init
-
-    - name: Terraform Validate
-      run: terraform validate
-
-    - name: Debug before Terraform Apply
-      run: echo "About to run Terraform Apply."
-
-    - name: Terraform Apply
-      run: terraform apply -auto-approve -var "DO_TOKEN=${{ secrets.DO_TOKEN }}" -var "SSH_KEY=${{ secrets.SSH_KEY }}"
-      env:
-        DO_TOKEN: ${{ secrets.DO_TOKEN }}
-        SSH_KEY: ${{ secrets.SSH_KEY }}
-        TF_LOG: DEBUG
-        
-    - name: Get Droplet IP and Store in File
-      run: terraform output -raw droplet_ip_address > droplet_ip.txt
-
-    - name: Display Droplet IP from File
-      run: cat droplet_ip.txt
-      
-    - name: Set and Clean Droplet IP
-      run: echo "DROPLET_IP=$(cat droplet_ip.txt)" >> $GITHUB_ENV
-      env:
-        DROPLET_IP: ""
-
-    # SSH and Deployment Steps
+     # SSH and Deployment Steps
     - name: Initialize and Setup SSH
       run: |
         eval $(ssh-agent -s)
-        ssh-keyscan $DROPLET_IP >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
         chmod 600 id_rsa
         ssh-add id_rsa
 
-    - name: Deploy to DigitalOcean
+    - name: Deploy to Existing DigitalOcean Droplet
       run: |
-        echo "Deploying to IP $DROPLET_IP"
-        rsync -av --delete ./ ${{ secrets.SSH_USER }}@$DROPLET_IP:/path/to/your/web/directory/
+        scp -r ./* ${{ secrets.SSH_USER }}@${{ secrets.DROPLET_IP }}:/path/to/your/web/directory/
       env:
         SSH_USER: ${{ secrets.SSH_USER }}
-        DROPLET_IP: ${{ env.DROPLET_IP }}
