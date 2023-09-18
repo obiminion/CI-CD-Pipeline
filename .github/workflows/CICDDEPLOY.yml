@@ -88,6 +88,7 @@ jobs:
     - name: Initialize and Setup SSH
       run: |
         eval $(ssh-agent -s)
+        ssh-keyscan $DROPLET_IP >> ~/.ssh/known_hosts
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
         chmod 600 id_rsa
         ssh-add id_rsa
@@ -95,11 +96,7 @@ jobs:
     - name: Deploy to DigitalOcean
       run: |
         echo "Deploying to IP $DROPLET_IP"
-        ssh -o "StrictHostKeyChecking=no" ${{ secrets.SSH_USER }}@$DROPLET_IP "
-          docker pull my-web-app:latest
-          docker stop web-container || true
-          docker rm web-container || true
-          docker run --name web-container -d -p 80:80 my-web-app:latest
-        "
+        rsync -av --delete ./ ${{ secrets.SSH_USER }}@$DROPLET_IP:/path/to/your/web/directory/
       env:
         SSH_USER: ${{ secrets.SSH_USER }}
+        DROPLET_IP: ${{ env.DROPLET_IP }}
